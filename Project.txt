@@ -1,0 +1,65 @@
+-- Membuat Database
+CREATE DATABASE penjualan;
+
+-- Menggunakan Database
+\c penjualan;
+
+-- Membuat Tabel Pelanggan
+CREATE TABLE Pelanggan (
+    PelangganID SERIAL PRIMARY KEY,
+    NamaPelanggan VARCHAR(100) NOT NULL,
+    Alamat VARCHAR(255)
+);
+
+-- Membuat Tabel Nota
+CREATE TABLE Nota (
+    NotaID SERIAL PRIMARY KEY,
+    Tanggal DATE NOT NULL,
+    PelangganID INT,
+    FOREIGN KEY (PelangganID) REFERENCES Pelanggan(PelangganID)
+);
+
+-- Membuat Tabel Produk
+CREATE TABLE Produk (
+    ProdukID SERIAL PRIMARY KEY,
+    NamaProduk VARCHAR(100) NOT NULL,
+    Harga DECIMAL(10, 2) NOT NULL
+);
+
+-- Membuat Tabel DetailNota
+CREATE TABLE DetailNota (
+    DetailID SERIAL PRIMARY KEY,
+    NotaID INT,
+    ProdukID INT,
+    Jumlah INT NOT NULL,
+    Total DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (NotaID) REFERENCES Nota(NotaID),
+    FOREIGN KEY (ProdukID) REFERENCES Produk(ProdukID)
+);
+
+-- Membuat Pengguna
+CREATE USER superuser WITH PASSWORD 'superpassword';
+CREATE USER admin WITH PASSWORD 'adminpassword';
+CREATE USER user WITH PASSWORD 'userpassword';
+
+-- Memberikan Hak Akses
+-- Superuser: Memiliki semua hak akses
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser;
+
+-- Admin: Hanya bisa INSERT dan UPDATE di tabel Nota dan DetailNota
+GRANT INSERT, UPDATE ON Nota TO admin;
+GRANT INSERT, UPDATE ON DetailNota TO admin;
+
+-- User: Hanya bisa melihat data (READ-ONLY)
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO user;
+
+-- Hak akses tambahan untuk keamanan
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT ON TABLES TO user;
+
+-- Mengecek Hak Akses
+-- Melihat semua pengguna yang dibuat
+\du
+
+-- Melihat hak akses pada tabel tertentu
+\z Nota;
